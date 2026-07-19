@@ -1,8 +1,8 @@
-library: ssl-network
+library: ssl
 target-type: dll
-Files:	 library
-	 c-wrapper
-	 openssl-wrapper
+Files: library
+       c-wrapper
+       openssl-wrapper
 C-libraries: -lssl -lcrypto
 C-source-files: support.c
 Platforms: aarch64-darwin

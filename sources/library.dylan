@@ -5,15 +5,16 @@ copyright: Original Code is Copyright (c) 2010 Dylan Hackers;
 License:   See License.txt in this distribution for details.
 Warranty:  Distributed WITHOUT WARRANTY OF ANY KIND
 
-define library ssl-network
+define library ssl
   use common-dylan;
   use C-FFI;
   use IO;
   use system, import: { file-system };
   use network;
-  export openssl-wrapper,
+  export
+    openssl-wrapper,
     ssl-sockets;
-end;
+end library;
 
 define module openssl-wrapper
   use dylan;
@@ -48,7 +49,7 @@ define module openssl-wrapper
 
   export SSL-set-mode, PEM-read-X509,
     SSL-context-add-extra-chain-certificate, SSL-set-tlsext-host-name;
-end;
+end module;
 
 define module ssl-sockets
   use common-dylan;
@@ -67,5 +68,4 @@ define module ssl-sockets
   export <ssl-failure>, <pem-file-failure>, <pem-file-not-available>,
     <pem-file-not-readable>, <error-reading-pem-file>, <x509-failure>,
     <ssl-error>, <err-error>;
-end;
-
+end module;

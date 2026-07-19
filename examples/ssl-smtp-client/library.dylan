@@ -11,7 +11,8 @@ define library ssl-smtp-client
   use io;
   use network;
   use regular-expressions;
-  use ssl-network;
+  use ssl;
 
-  export ssl-smtp-client;
-end library ssl-smtp-client;
+  export
+    ssl-smtp-client;
+end library;

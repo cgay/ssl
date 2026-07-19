@@ -7,10 +7,14 @@ Warranty:     Distributed WITHOUT WARRANTY OF ANY KIND
 
 define library ssl-echo-server
   use common-dylan;
+  use system;
   use io;
   use network;
-  use ssl-network;
-  export ssl-echo-server;
+  use ssl;
+  use system;
+
+  export
+    ssl-echo-server;
 end library;
 
 define module ssl-echo-server
