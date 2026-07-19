@@ -1,0 +1,11 @@
+{
+    "name": "ssl",
+    "version": "0.1.0",
+    "description": "Wrapper for the OpenSSL library",
+    "keywords": [ "crypto", "cryptography", "DTLS", "openssl", "QUIC", "SSL", "TLS", "X.509" ],
+    "dependencies": [],
+    "dev-dependencies": [
+        "testworks"
+    ],
+    "url": "https://github.com/dylan-lang/ssl"
+}
