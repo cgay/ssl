@@ -21,23 +21,29 @@ define module ssl-smtp-client
 
   export $default-smtp-port;
 
-  export <smtp-error>,
-	 <transient-smtp-error>,
-	 <permanent-smtp-error>,
-	 smtp-error-code,
-         $invalid-response-error-code,
-	 smtp-error-response;
+  export
+    <smtp-error>,
+    <transient-smtp-error>,
+    <permanent-smtp-error>,
+    smtp-error-code,
+    $invalid-response-error-code,
+    smtp-error-response;
 
-  export \with-smtp-stream,
-	 open-smtp-stream,
-	 close-smtp-stream,
-	 write-smtp-from,
-	 write-smtp-recipient,
-	 write-smtp-data-start,
-	 write-smtp-data-end;
+  export
+    open-smtp-stream,
+    close-smtp-stream,
+    write-smtp-from,
+    write-smtp-recipient,
+    write-smtp-data-start,
+    write-smtp-data-end;
 
-  export \with-smtp-message-stream,
-	 open-smtp-message-stream,
-	 close-smtp-message-stream,
-	 send-smtp-message;
-end module ssl-smtp-client;
+  export
+    open-smtp-message-stream,
+    close-smtp-message-stream,
+    send-smtp-message;
+
+  // These break dylan-mode indentation so put them at the end.
+  export
+    with-smtp-message-stream,
+    with-smtp-stream;
+end module;

@@ -79,8 +79,8 @@ define abstract class <ssl-socket> (<TCP-socket>)
   slot ssl-context :: <SSL-CTX>;
 end;
 
-define method make (class == <ssl-socket>, #rest initargs,
-                    #key element-type = <byte-character>)
+define method make
+    (class == <ssl-socket>, #rest initargs, #key element-type = <byte-character>)
  => (stream :: <ssl-socket>)
   apply(make, client-class-for-element-type(class, element-type), initargs)
 end;
@@ -107,7 +107,8 @@ define method client-class-for-element-type
 end;
 
 define method client-class-for-element-type
-    (class == <ssl-socket>, element-type == <byte-character>) => (class == <byte-char-ssl-socket>)
+    (class == <ssl-socket>, element-type == <byte-character>)
+ => (class == <byte-char-ssl-socket>)
   <byte-char-ssl-socket>
 end;
 
@@ -134,7 +135,9 @@ end;
 define class <err-error> (<ssl-failure>)
 end;
 
-define method initialize (sock :: <ssl-socket>, #rest rest, #key lower, requested-buffer-size, acc?, ssl-method = #"TLS", #all-keys)
+define method initialize
+    (sock :: <ssl-socket>, #rest rest,
+     #key lower, requested-buffer-size, acc?, ssl-method = #"TLS", #all-keys)
  => ()
   let keys = list(#"port", lower.remote-port,
                   #"host", lower.remote-host,
@@ -185,15 +188,16 @@ end;
 define class <unix-ssl-socket-accessor> (<unix-socket-accessor>)
 end;
 
-define method initialize (s :: <ssl-server-socket>, #rest rest,
-                          #key ssl-method = #"TLS", certificate, key, certificate-chain, #all-keys)
+define method initialize
+    (s :: <ssl-server-socket>, #rest rest,
+     #key ssl-method = #"TLS", certificate, key, certificate-chain, #all-keys)
  => ()
   let con = select (ssl-method)
               #"TLS" => TLS-server-method;
               #"TLSv1" => TLSv1-server-method;
               #"TLSv1.1" => TLSv1-1-server-method;
               #"TLSv1.2" => TLSv1-2-server-method;
-	    end;
+            end;
   let ctx = SSL-context-new(con());
   if (null-pointer?(ctx))
     ERR-error();
@@ -221,12 +225,12 @@ define method initialize (s :: <ssl-server-socket>, #rest rest,
   end;
   if (certificate-chain)
     let cas = if (instance?(certificate-chain, <string>))
-		list(certificate-chain)
-	      else
-		certificate-chain
-	      end;
+                list(certificate-chain)
+              else
+                certificate-chain
+              end;
     let rs = map(curry(SSL-context-add-extra-chain-certificate, s.ssl-context),
-		 map(read-pem, cas));
+                 map(read-pem, cas));
     if (any?(curry(\~=, 1), rs))
       ERR-error();
     end
@@ -243,19 +247,19 @@ define method accept
   let result =
     with-lock (socket-manager-lock(manager))
       let lower = apply(make,
-			client-class-for-server(lower-socket),
-			descriptor: descriptor,
-			element-type: element-type | lower-socket.default-element-type,
-			args);
+                        client-class-for-server(lower-socket),
+                        descriptor: descriptor,
+                        element-type: element-type | lower-socket.default-element-type,
+                        args);
       if (server-socket.starttls?)
-	lower
+        lower
       else
-	block()
-	  start-tls(server-socket, lower)
-	exception (s :: type-union(<err-error>, <ssl-error>))
-	  close(lower);
-	  #f;
-	end;
+        block()
+          start-tls(server-socket, lower)
+        exception (s :: type-union(<err-error>, <ssl-error>))
+          close(lower);
+          #f;
+        end;
       end;
     end with-lock;
   result | apply(accept, server-socket, args)
@@ -299,29 +303,34 @@ define function ssl-error (ssl, r) => ()
   if (err == $SSL-ERROR-SSL)
     ERR-error(prefix: "received ssl error");
   elseif (err == $SSL-ERROR-SYSCALL)
-    signal(make(<ssl-error>, format-string: "received syscall error %d while calling openssl", format-arguments: errno()));
+    signal(make(<ssl-error>,
+                format-string: "received syscall error %d while calling openssl",
+                format-arguments: errno()));
   end;
-  signal(make(<ssl-error>, format-string: "%d %s",
-	      format-arguments: list(err,
-	      select (err)
-		$SSL-ERROR-NONE => "no error";
-		$SSL-ERROR-SSL => "SSL error";
-		$SSL-ERROR-WANT-READ => "WANT READ";
-		$SSL-ERROR-WANT-WRITE => "WANT WRITE";
-		$SSL-ERROR-WANT-X509-LOOKUP => "WANT X509 LOOKUP";
-		$SSL-ERROR-SYSCALL => "SYSCALL error";
-		$SSL-ERROR-ZERO-RETURN => "ZERO RETURN";
-		$SSL-ERROR-WANT-CONNECT => "WANT CONNECT";
-		$SSL-ERROR-WANT-ACCEPT => "WANT ACCEPT";
-		otherwise => "unknown error";
-	      end)));
-end;
+  let description
+    = select (err)
+        $SSL-ERROR-NONE => "no error";
+        $SSL-ERROR-SSL => "SSL error";
+        $SSL-ERROR-WANT-READ => "WANT READ";
+        $SSL-ERROR-WANT-WRITE => "WANT WRITE";
+        $SSL-ERROR-WANT-X509-LOOKUP => "WANT X509 LOOKUP";
+        $SSL-ERROR-SYSCALL => "SYSCALL error";
+        $SSL-ERROR-ZERO-RETURN => "ZERO RETURN";
+        $SSL-ERROR-WANT-CONNECT => "WANT CONNECT";
+        $SSL-ERROR-WANT-ACCEPT => "WANT ACCEPT";
+        otherwise => "unknown error";
+      end;
+  signal(make(<ssl-error>,
+              format-string: "%d %s",
+              format-arguments: list(err, description)))
+end function;
 
 define method close
     (the-socket :: <ssl-server-socket>,
      #rest keys,
      #key abort? = #f, wait? = #t, synchronize? = #f,
-     already-unregistered? = #f) => ()
+          already-unregistered? = #f)
+ => ()
   SSL-context-free(the-socket.ssl-context);
   close(the-socket.underlying-socket);
   the-socket.socket-descriptor := #f;
@@ -329,7 +338,8 @@ end;
 
 define method accessor-read-into!
     (accessor :: <unix-ssl-socket-accessor>, stream :: <platform-socket>,
-     offset :: <buffer-index>, count :: <buffer-index>, #key buffer)
+     offset :: <buffer-index>, count :: <buffer-index>,
+     #key buffer)
  => (nread :: <integer>)
   let the-buffer = buffer | stream-input-buffer(stream);
   with-object-byte-storage (buffer-storage-address = the-buffer)
@@ -347,8 +357,9 @@ end;
 
 define method accessor-write-from
     (accessor :: <unix-ssl-socket-accessor>, stream :: <platform-socket>,
-     offset :: <buffer-index>, count :: <buffer-index>, #key buffer,
-     return-fresh-buffer?) => (nwritten :: <integer>, new-buffer :: <buffer>)
+     offset :: <buffer-index>, count :: <buffer-index>,
+     #key buffer, return-fresh-buffer?)
+ => (nwritten :: <integer>, new-buffer :: <buffer>)
   let buffer = buffer | stream-output-buffer(stream);
   with-object-byte-storage (buffer-storage-address = buffer)
     let nwritten
@@ -394,15 +405,18 @@ end;
 
 define method accessor-open
     (accessor :: <unix-ssl-socket-accessor>, locator, #rest rest,
-     #key remote-host, remote-port, descriptor, no-delay?, direction, if-exists, if-does-not-exist,
-     #all-keys) => ()
+     #key remote-host, remote-port, descriptor, no-delay?, direction,
+          if-exists, if-does-not-exist,
+     #all-keys)
+ => ()
   if (descriptor)
     //this is a connected socket returned by accept
     accessor.socket-descriptor := descriptor;
   end;
 end;
 
-define method client-class-for-server (server :: <ssl-server-socket>) => (res == <ssl-socket>)
+define method client-class-for-server
+    (server :: <ssl-server-socket>) => (res == <ssl-socket>)
   <ssl-socket>
 end;
 
@@ -411,18 +425,17 @@ define method type-for-socket (s :: <ssl-socket>) => (res == #"SSL")
 end;
 
 define sideways method platform-accessor-class
-    (type == #"SSL", locator)
- => (class == <unix-ssl-socket-accessor>)
+    (type == #"SSL", locator) => (class == <unix-ssl-socket-accessor>)
   ignore(locator);
   <unix-ssl-socket-accessor>
-end method platform-accessor-class;
+end method;
 
-define sideways method ssl-socket-class (class == <TCP-socket>)
- => (ssl-class == <ssl-socket>)
+define sideways method ssl-socket-class
+    (class == <TCP-socket>) => (ssl-class == <ssl-socket>)
   <ssl-socket>
 end;
 
-define sideways method ssl-server-socket-class (class == <TCP-server-socket>)
- => (ssl-server-class == <ssl-server-socket>)
+define sideways method ssl-server-socket-class
+    (class == <TCP-server-socket>) => (ssl-server-class == <ssl-server-socket>)
   <ssl-server-socket>
 end;
