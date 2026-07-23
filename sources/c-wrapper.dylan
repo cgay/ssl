@@ -250,7 +250,7 @@ define C-function SSL-context-add-extra-chain-certificate
 end;
 
 define C-function SSL-set-tlsext-host-name
-  input parameter context :: <SSL-CTX>;
+  input parameter context :: <SSL*>;
   input parameter name :: <C-string>;
   result res :: <C-int>;
   c-name: "my_SSL_set_tlsext_host_name"
