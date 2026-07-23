@@ -1,10 +1,11 @@
-library: ssl
-target-type: dll
+Library: ssl
+Target-type: dll
+Executable: ssl-dylan
 Files: library
        c-wrapper
        openssl-wrapper
-C-libraries: -lssl -lcrypto
 C-source-files: support.c
+Jam-includes: ssl-dylan.jam
 Platforms: aarch64-darwin
            arm-linux
            x86-freebsd
