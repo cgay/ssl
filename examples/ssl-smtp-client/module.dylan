@@ -9,8 +9,7 @@ Warranty:     Distributed WITHOUT WARRANTY OF ANY KIND
 define module ssl-smtp-client
   use common-dylan;
   use format-out;
-  use format,
-    import: { format };
+  use format;
   use standard-io;
   use regular-expressions;
   use sockets;
