@@ -143,6 +143,8 @@ define method initialize
                   #"host", lower.remote-host,
                   #"direction", lower.stream-direction);
   apply(next-method, sock, keys);
+  // TODO(cgay): instead of passing `acc?: #t` when creating a server-side client socket,
+  // make a <ssl-client-socket> class?
   unless (acc?) //not a server socket via accept
     //already setup a connection! do SSL handshake over this connection
     let con = select (ssl-method)
@@ -179,6 +181,9 @@ define method initialize
   end
 end;
 
+// TODO(cgay): it's odd that this is a subclass of <tcp-server-socket> and yet
+// `make(class == <tcp-server-socket>, ssl?: #t, ...)` makes BOTH a <tcp-server-socket>
+// AND an <ssl-server-socket>.  Surely we can just make an <ssl-server-socket>?
 define class <ssl-server-socket> (<TCP-server-socket>)
   constant slot underlying-socket :: <server-socket>, init-keyword: lower:;
   slot ssl-context :: <SSL-CTX>;
@@ -305,7 +310,7 @@ define function ssl-error (ssl, r) => ()
   elseif (err == $SSL-ERROR-SYSCALL)
     signal(make(<ssl-error>,
                 format-string: "received syscall error %d while calling openssl",
-                format-arguments: errno()));
+                format-arguments: list(errno())));
   end;
   let description
     = select (err)
