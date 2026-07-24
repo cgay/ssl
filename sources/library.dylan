@@ -68,4 +68,10 @@ define module ssl-sockets
   export <ssl-failure>, <pem-file-failure>, <pem-file-not-available>,
     <pem-file-not-readable>, <error-reading-pem-file>, <x509-failure>,
     <ssl-error>, <err-error>;
+
+  export
+    // TODO(cgay): exporting this from ssl-sockets for now, but we may ultimately want to
+    // have separate modules for sockets and crypto and I'm not sure where this should
+    // ultimately end up yet.
+    read-pem-file;
 end module;

@@ -38,6 +38,7 @@ define constant $nullp = null-pointer(<C-void*>);
 define class <ssl-failure> (<socket-error>)
 end;
 
+// TODO(cgay): This is in no way a socket error; rework the class hierarchy.
 define class <pem-file-failure> (<ssl-failure>)
 end;
 
@@ -53,21 +54,29 @@ end;
 define class <x509-failure> (<ssl-failure>)
 end;
 
-define function read-pem (filename :: <string>) => (result :: <x509>)
+define function read-pem-file (filename :: <pathname>) => (result :: <x509>)
   unless (file-exists?(filename))
-    signal(make(<pem-file-not-available>))
+    signal(make(<pem-file-not-available>,
+                format-string: "pem file not found: %s",
+                format-arguments: list(filename)))
   end;
-  unless (file-property(as(<pathname>, filename), #"readable?"))
-    signal(make(<pem-file-not-readable>))
+  unless (file-property(filename, #"readable?"))
+    signal(make(<pem-file-not-readable>,
+                format-string: "pem file not readable: %s",
+                format-arguments: list(filename)))
   end;
   let x = X509-new(); //need to manually free the X509 struct?
   if (null-pointer?(x))
     let e = ERR-error();
     signal(make(<x509-failure>, format-string: "%s", format-arguments: e))
   else
-    let ret = PEM-read-X509(filename, C-pointer-at(<x509**>, x), $nullp, $nullp);
+    let ret = PEM-read-X509(as(<byte-string>, filename),
+                            C-pointer-at(<x509**>, x),
+                            $nullp, $nullp);
     if (null-pointer?(ret))
-      signal(make(<x509-failure>))
+      signal(make(<x509-failure>,
+                  format-string: "pem file failed to load: %s",
+                  format-arguments: list(filename)))
     else
       ret
     end
@@ -223,7 +232,7 @@ define method initialize
                 certificate-chain
               end;
     let rs = map(curry(SSL-context-add-extra-chain-certificate, s.ssl-context),
-                 map(read-pem, cas));
+                 map(read-pem-file, cas));
     if (any?(curry(\~=, 1), rs))
       ERR-error();
     end
