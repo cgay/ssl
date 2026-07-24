@@ -19,6 +19,7 @@ end library;
 
 define module ssl-echo-server
   use dylan;
+  use file-system;
   use streams;
   use simple-format;
   use threads;

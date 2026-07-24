@@ -9,6 +9,10 @@ Warranty:     Distributed WITHOUT WARRANTY OF ANY KIND
 
 define method echo-server () => ();
   start-sockets();
+  if (~file-exists?("certificate.pem"))
+    error("The ssl-echo-server needs to be invoked in the examples/ssl-echo-server"
+            " directory so that it can find the certificate.pem and key.pem files.");
+  end;
   let server-socket = make(<TCP-server-socket>,
                            port: 4007,
                            ssl?: #t,
