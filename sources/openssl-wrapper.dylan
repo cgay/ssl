@@ -137,7 +137,7 @@ end;
 
 define method initialize
     (sock :: <ssl-socket>, #rest rest,
-     #key lower, requested-buffer-size, acc?, ssl-method = #"TLS", #all-keys)
+     #key lower, requested-buffer-size, acc?, #all-keys)
  => ()
   let keys = list(#"port", lower.remote-port,
                   #"host", lower.remote-host,
@@ -147,13 +147,7 @@ define method initialize
   // make a <ssl-client-socket> class?
   unless (acc?) //not a server socket via accept
     //already setup a connection! do SSL handshake over this connection
-    let con = select (ssl-method)
-                #"TLS" => TLS-client-method;
-                #"TLSv1" => TLSv1-client-method;
-                #"TLSv1.1" => TLSv1-1-client-method;
-                #"TLSv1.2" => TLSv1-2-client-method;
-              end;
-    let ctx = SSL-context-new(con());
+    let ctx = SSL-context-new(tls-client-method());
     if (null-pointer?(ctx))
       ERR-error();
     end;
@@ -195,15 +189,9 @@ end;
 
 define method initialize
     (s :: <ssl-server-socket>, #rest rest,
-     #key ssl-method = #"TLS", certificate, key, certificate-chain, #all-keys)
+     #key certificate, key, certificate-chain, #all-keys)
  => ()
-  let con = select (ssl-method)
-              #"TLS" => TLS-server-method;
-              #"TLSv1" => TLSv1-server-method;
-              #"TLSv1.1" => TLSv1-1-server-method;
-              #"TLSv1.2" => TLSv1-2-server-method;
-            end;
-  let ctx = SSL-context-new(con());
+  let ctx = SSL-context-new(tls-server-method());
   if (null-pointer?(ctx))
     ERR-error();
   end;
