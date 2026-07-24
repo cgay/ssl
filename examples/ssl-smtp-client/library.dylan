@@ -16,3 +16,44 @@ define library ssl-smtp-client
   export
     ssl-smtp-client;
 end library;
+
+define module ssl-smtp-client
+  use common-dylan;
+  use format-out;
+  use format;
+  use standard-io;
+  use regular-expressions;
+  use sockets;
+  use ssl-sockets;
+  use streams;
+
+  export *debug-smtp*;
+
+  export $default-smtp-port;
+
+  export
+    <smtp-error>,
+    <transient-smtp-error>,
+    <permanent-smtp-error>,
+    smtp-error-code,
+    $invalid-response-error-code,
+    smtp-error-response;
+
+  export
+    open-smtp-stream,
+    close-smtp-stream,
+    write-smtp-from,
+    write-smtp-recipient,
+    write-smtp-data-start,
+    write-smtp-data-end;
+
+  export
+    open-smtp-message-stream,
+    close-smtp-message-stream,
+    send-smtp-message;
+
+  // These break dylan-mode indentation so put them at the end.
+  export
+    with-smtp-message-stream,
+    with-smtp-stream;
+end module;
