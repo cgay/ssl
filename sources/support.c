@@ -27,8 +27,8 @@ long my_SSL_CTX_add_extra_chain_cert (SSL_CTX* ctx, X509* x509) {
   return SSL_CTX_add_extra_chain_cert(ctx, x509);
 }
 
-int my_SSL_set_tlsext_host_name(SSL_CTX* ctx, char* name) {
-  return SSL_set_tlsext_host_name(ctx, name);
+int my_SSL_set_tlsext_host_name(SSL* ssl, char* name) {
+  return SSL_set_tlsext_host_name(ssl, name);
 }
 
 int my_SSL_library_init() {

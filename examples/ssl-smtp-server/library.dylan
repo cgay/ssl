@@ -9,8 +9,10 @@ define library ssl-smtp-server
   use common-dylan;
   use io;
   use network;
-  use ssl-network;
-  export ssl-smtp-server;
+  use ssl;
+
+  export
+    ssl-smtp-server;
 end library;
 
 define module ssl-smtp-server

@@ -103,6 +103,8 @@ end;
 //hope that I can treat this as opaque
 define constant <SSL-METHOD> = <C-void*>;
 
+// The doc doesn't seem to say what this is for, and we don't use it (but we do export
+// it).
 define C-function TLS-method
   result ssl-method :: <SSL-METHOD>;
   c-name: "TLS_method"
@@ -116,51 +118,6 @@ end;
 define C-function TLS-client-method
   result ssl-method :: <SSL-METHOD>;
   c-name: "TLS_client_method"
-end;
-
-define C-function TLSv1-method
-  result ssl-method :: <SSL-METHOD>;
-  c-name: "TLSv1_method"
-end;
-
-define C-function TLSv1-server-method
-  result ssl-method :: <SSL-METHOD>;
-  c-name: "TLSv1_server_method"
-end;
-
-define C-function TLSv1-client-method
-  result ssl-method :: <SSL-METHOD>;
-  c-name: "TLSv1_client_method"
-end;
-
-define C-function TLSv1-1-method
-  result ssl-method :: <SSL-METHOD>;
-  c-name: "TLSv1_1_method"
-end;
-
-define C-function TLSv1-1-server-method
-  result ssl-method :: <SSL-METHOD>;
-  c-name: "TLSv1_1_server_method"
-end;
-
-define C-function TLSv1-1-client-method
-  result ssl-method :: <SSL-METHOD>;
-  c-name: "TLSv1_1_client_method"
-end;
-
-define C-function TLSv1-2-method
-  result ssl-method :: <SSL-METHOD>;
-  c-name: "TLSv1_2_method"
-end;
-
-define C-function TLSv1-2-server-method
-  result ssl-method :: <SSL-METHOD>;
-  c-name: "TLSv1_2_server_method"
-end;
-
-define C-function TLSv1-2-client-method
-  result ssl-method :: <SSL-METHOD>;
-  c-name: "TLSv1_2_client_method"
 end;
 
 //opaque!?
@@ -250,7 +207,7 @@ define C-function SSL-context-add-extra-chain-certificate
 end;
 
 define C-function SSL-set-tlsext-host-name
-  input parameter context :: <SSL-CTX>;
+  input parameter context :: <SSL*>;
   input parameter name :: <C-string>;
   result res :: <C-int>;
   c-name: "my_SSL_set_tlsext_host_name"

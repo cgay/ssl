@@ -9,16 +9,19 @@ Warranty:     Distributed WITHOUT WARRANTY OF ANY KIND
 
 define method echo-server () => ();
   start-sockets();
+  if (~file-exists?("certificate.pem"))
+    error("The ssl-echo-server needs to be invoked in the examples/ssl-echo-server"
+            " directory so that it can find the certificate.pem and key.pem files.");
+  end;
   let server-socket = make(<TCP-server-socket>,
-                           port: 4007, ssl?: #t,
+                           port: 4007,
+                           ssl?: #t,
                            certificate: "certificate.pem",
                            key: "key.pem");
   block ()
     while (#t)
       let reply-socket = accept(server-socket);
-      make(<thread>, function: method ()
-                                 handle-request(reply-socket)
-                               end)
+      make(<thread>, function: curry(handle-request, reply-socket))
     end;
   cleanup
     close(server-socket);
@@ -49,5 +52,3 @@ define method handle-request (socket)
 end method;
 
 echo-server();
-
-

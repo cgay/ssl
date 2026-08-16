@@ -9,7 +9,12 @@ Warranty:     Distributed WITHOUT WARRANTY OF ANY KIND
 
 define method smtp-server () => ();
   start-sockets();
-  let the-server = make(<TCP-server-socket>, port: 1025, ssl?: #t, certificate: "certificate.pem", key: "key.pem", starttls?: #t);
+  let the-server = make(<TCP-server-socket>,
+                        port: 1025,
+                        ssl?: #t,
+                        certificate: "certificate.pem",
+                        key: "key.pem",
+                        starttls?: #t);
   block ()
     while (#t)
       let reply-socket = accept(the-server);

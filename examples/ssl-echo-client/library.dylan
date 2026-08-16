@@ -9,8 +9,9 @@ define library ssl-echo-client
   use common-dylan;
   use io;
   use network;
-  use ssl-network;
-  export ssl-echo-client;
+  use ssl;
+  export
+    ssl-echo-client;
 end library;
 
 define module ssl-echo-client
