@@ -1,0 +1,31 @@
+Module: ssl-test-suite
+
+define constant $pem-cert
+  = """
+    -----BEGIN CERTIFICATE-----
+    MIIDWzCCAkOgAwIBAgIURp7CCad6GhmkVBJ2cxFF/8tpAbUwDQYJKoZIhvcNAQEL
+    BQAwPTELMAkGA1UEBhMCVVMxFjAUBgNVBAgMDU1hc3NhY2h1c2V0dHMxFjAUBgNV
+    BAoMDUR5bGFuIEhhY2tlcnMwHhcNMjExMjI1MDU0NzU5WhcNMzUwOTAzMDU0NzU5
+    WjA9MQswCQYDVQQGEwJVUzEWMBQGA1UECAwNTWFzc2FjaHVzZXR0czEWMBQGA1UE
+    CgwNRHlsYW4gSGFja2VyczCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB
+    AKp5xFt3Q5+ftXx+9chR23uSgVsK+TzFcaTXkG78kvrsQpX5mzWwK6kfcHZdMDll
+    Ne9OnErpNMBW++bkfCBILFc6jZ4/tF4aP9GvVyNJd0BPiG7ASFysf5n5ck0Zkfl3
+    pk5GxW/T0GqqplQ4/5FlN270K+lwTLSRqkhdy5nHKb99WneDE0VczTeQR+bdjXNj
+    hWw33oxBsMtcrwH3s8Ho+7Cxeto9HEbTkJAyqc5YgjZmOismGrVx9zxhfh17V5OL
+    U6aSJ+BmJBsQYeDow571NxpAemXlQOKudeRljoBF7PRDmwENEmpUt4WaHHk+3Oic
+    6xyj6w+Qp4wZ2i72Pmu/m1UCAwEAAaNTMFEwHQYDVR0OBBYEFH2haYTv0mEgvWLU
+    IczrNrVu7+QbMB8GA1UdIwQYMBaAFH2haYTv0mEgvWLUIczrNrVu7+QbMA8GA1Ud
+    EwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBADzMf11wQwiBodNTZ2FR1MEq
+    Uh4TajND4tlKmjuOm9md3odSEUOlnNZ7oPv/lNJbJZ2GJNB9j/2mo8CF5/yW7QcB
+    WiJKSxFY6fyhU7iyJhACUqJQ8gqjwt0HWSqMOssD5uooxp3K2LOr0uGIslVCc5N2
+    JNGJihINjn5hJjohYyZneF6nBeOgl1kCjENZ60yvxLaQpyagHd35juzNkVuzURHx
+    9MJpJ3IRM78HO41iBOpQDZE0yBMyZvqwCQ97ea/FTJhyUhKd5waiFgU3NIvHwWtK
+    jrWNJUzcWCPwKpo3uCIXHrfqwcgSTOW23jkb0GFctGv/hw6BUcb+SXaxdXgD/48=
+    -----END CERTIFICATE-----
+    """;
+
+define test test-read-pem-file ()
+  let path = write-test-file("cert.pem", contents: $pem-cert);
+  expect-condition(<pem-file-not-available>, read-pem-file("missing.pem"));
+  expect-instance?(<x509>, read-pem-file(path));
+end test;
