@@ -21,12 +21,24 @@ jobs:
 
       - name: Install Open Dylan
         uses: dylan-lang/install-opendylan@v3
+        with:
+          tag: v2026.2.0
 
       - name: Install dependencies
         run: deft update
 
       - name: Build and Run Tests
-        run: deft test -- --report surefire --report-file _build/test-output.xml
+        run: |
+          echo "uname: $(uname -s)"
+          if [[ "$(uname -s)" == "Darwin" ]]; then
+            file /opt/homebrew/Cellar/openssl@3/3.6.3/lib/libssl.3.dylib
+            dir="$(pkgconf --cflags openssl | sed s/-I//)/openssl/"
+            echo "dir=${dir}"
+            ls -l "${dir}"
+            echo "$(pkgconf --cflags openssl)"
+            echo "$(pkgconf --libs openssl)"
+          fi
+          deft test -- --report surefire --report-file _build/test-output.xml
 
       - name: Publish Test Report
         if: success() || failure()

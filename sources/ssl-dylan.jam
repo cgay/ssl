@@ -2,4 +2,6 @@
   local _dll = [ FDLLName $(IMAGE) ] ;
   local _modules = openssl ;
   LinkPkgConfigLibraries $(_dll) : $(_modules) ;
+  local _cs = support.c ;
+  ObjectPkgConfigCcFlags $(_cs) : $(_modules) ;
 }
